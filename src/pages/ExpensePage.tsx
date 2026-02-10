@@ -85,188 +85,188 @@ export default function ExpensePage() {
       });
     }
   };
- 
-   const handleEditTransaction = async (txId: string, data: {
-     date: string;
-     category: string;
-     subcategory: string;
-     description: string;
-     amount: number;
-     type: 'income' | 'expense';
-   }) => {
-     const result = await updateTransaction(txId, data);
-     if (result.error) {
-       toast({
-         variant: 'destructive',
-         title: 'Gagal mengupdate',
-         description: result.error.message,
-       });
-       return { error: result.error };
-     }
-     toast({ title: 'Transaksi berhasil diperbarui' });
-     return {};
-   };
- 
-   const openEditModal = (transaction: Transaction) => {
-     setEditingTransaction(transaction);
-     setIsEditModalOpen(true);
-   };
- 
-   // Sort by date descending
-   const sortedExpenses = [...expenses].sort(
-     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-   );
- 
-   const recentExpenses = sortedExpenses.slice(0, 10);
- 
-   if (isLoading) {
-     return (
-       <Layout>
-         <div className="flex h-[60vh] items-center justify-center">
-           <div className="animate-pulse text-center">
-             <div className="h-12 w-12 mx-auto rounded-full bg-primary/20 mb-4" />
-             <p className="text-muted-foreground">Memuat data...</p>
-           </div>
-         </div>
-       </Layout>
-     );
-   }
- 
-   return (
-     <>
-       <Layout>
-         <div className="space-y-6">
-           {/* Header */}
-           <div>
-             <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
-               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/20 text-destructive">
-                 <TrendingDown className="h-5 w-5" />
-               </div>
-               Catat Pengeluaran
-             </h1>
-             <p className="text-muted-foreground mt-2">
-               Tambahkan pengeluaran baru dengan kategori 50-30-15-5
-             </p>
-           </div>
- 
-           <div className="grid gap-6 lg:grid-cols-2">
-             {/* Expense form */}
-             <Card className="glass-card">
-               <CardHeader>
-                 <CardTitle className="font-serif">Form Pengeluaran Baru</CardTitle>
-                 <CardDescription>
-                   Pilih kategori yang sesuai untuk pengeluaran
-                 </CardDescription>
-               </CardHeader>
-               <CardContent>
-                 <ExpenseForm onSubmit={handleAddExpense} paymentMethods={paymentMethods} />
-               </CardContent>
-             </Card>
- 
-             {/* Recent expenses */}
-             <Card className="glass-card">
-               <CardHeader>
-                 <CardTitle className="font-serif flex items-center gap-2">
-                   <History className="h-5 w-5" />
-                   Riwayat Pengeluaran
-                 </CardTitle>
-                 <CardDescription>
-                   {expenses.length} total pengeluaran tercatat
-                 </CardDescription>
-               </CardHeader>
-               <CardContent>
-                 {recentExpenses.length === 0 ? (
-                   <div className="flex h-[300px] items-center justify-center">
-                     <div className="text-center">
-                       <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                         <span className="text-2xl">💸</span>
-                       </div>
-                       <p className="text-muted-foreground">Belum ada pengeluaran</p>
-                     </div>
-                   </div>
-                 ) : (
-                   <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                     {recentExpenses.map((expense) => (
-                       <div
-                         key={expense.id}
-                         className="flex items-center justify-between p-3 rounded-xl bg-destructive/5 border border-destructive/20 hover:bg-destructive/10 transition-colors group"
-                       >
-                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/20">
-                             <span className="text-lg">{categoryIcons[expense.category] || '💰'}</span>
-                           </div>
-                           <div className="min-w-0 flex-1">
-                             <p className="font-medium text-sm truncate">
-                               {expense.subcategory}
-                             </p>
-                             <p className="text-xs text-muted-foreground truncate">
-                               {expense.description || expense.category}
-                             </p>
-                             <p className="text-xs text-muted-foreground">
-                               {format(parseISO(expense.date), 'd MMM yyyy', { locale: id })}
-                             </p>
-                           </div>
-                         </div>
-                         <div className="flex items-center gap-2">
-                           <p className="font-semibold text-sm text-destructive whitespace-nowrap">
-                             -{formatCurrency(Number(expense.amount))}
-                           </p>
-                           <Button
-                             variant="ghost"
-                             size="icon"
-                             onClick={() => openEditModal(expense)}
-                             className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                           >
-                             <Edit2 className="h-4 w-4" />
-                           </Button>
-                           <AlertDialog>
-                             <AlertDialogTrigger asChild>
-                               <Button
-                                 variant="ghost"
-                                 size="icon"
-                                 className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                               >
-                                 <Trash2 className="h-4 w-4" />
-                               </Button>
-                             </AlertDialogTrigger>
-                             <AlertDialogContent>
-                               <AlertDialogHeader>
-                                 <AlertDialogTitle>Hapus Pengeluaran?</AlertDialogTitle>
-                                 <AlertDialogDescription>
-                                   Anda akan menghapus pengeluaran {expense.subcategory} sebesar{' '}
-                                   {formatCurrency(Number(expense.amount))}. Tindakan ini tidak dapat dibatalkan.
-                                 </AlertDialogDescription>
-                               </AlertDialogHeader>
-                               <AlertDialogFooter>
-                                 <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteExpense(expense.id, (expense as any).payment_method_id, Number(expense.amount))}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Hapus
-                            </AlertDialogAction>
-                               </AlertDialogFooter>
-                             </AlertDialogContent>
-                           </AlertDialog>
-                         </div>
-                       </div>
-                     ))}
-                   </div>
-                 )}
-               </CardContent>
-             </Card>
-           </div>
-         </div>
-       </Layout>
-       <EditTransactionModal
-         transaction={editingTransaction}
-         isOpen={isEditModalOpen}
-         onClose={() => {
-           setIsEditModalOpen(false);
-           setEditingTransaction(null);
-         }}
-         onSave={handleEditTransaction}
-       />
-     </>
-   );
- }
+
+  const handleEditTransaction = async (txId: string, data: {
+    date: string;
+    category: string;
+    subcategory: string;
+    description: string;
+    amount: number;
+    type: 'income' | 'expense';
+  }) => {
+    const result = await updateTransaction(txId, data);
+    if (result.error) {
+      toast({
+        variant: 'destructive',
+        title: 'Gagal mengupdate',
+        description: result.error.message,
+      });
+      return { error: result.error };
+    }
+    toast({ title: 'Transaksi berhasil diperbarui' });
+    return {};
+  };
+
+  const openEditModal = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsEditModalOpen(true);
+  };
+
+  // Sort by date descending
+  const sortedExpenses = [...expenses].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  const recentExpenses = sortedExpenses;
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex h-[60vh] items-center justify-center">
+          <div className="animate-pulse text-center">
+            <div className="h-12 w-12 mx-auto rounded-full bg-primary/20 mb-4" />
+            <p className="text-muted-foreground">Memuat data...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <>
+      <Layout>
+        <div className="space-y-6">
+          {/* Header */}
+          <div>
+            <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/20 text-destructive">
+                <TrendingDown className="h-5 w-5" />
+              </div>
+              Catat Pengeluaran
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Tambahkan pengeluaran baru dengan kategori 50-30-15-5
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Expense form */}
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="font-serif">Form Pengeluaran Baru</CardTitle>
+                <CardDescription>
+                  Pilih kategori yang sesuai untuk pengeluaran
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ExpenseForm onSubmit={handleAddExpense} paymentMethods={paymentMethods} />
+              </CardContent>
+            </Card>
+
+            {/* Recent expenses */}
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="font-serif flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Riwayat Pengeluaran
+                </CardTitle>
+                <CardDescription>
+                  {expenses.length} total pengeluaran tercatat
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {recentExpenses.length === 0 ? (
+                  <div className="flex h-[300px] items-center justify-center">
+                    <div className="text-center">
+                      <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                        <span className="text-2xl">💸</span>
+                      </div>
+                      <p className="text-muted-foreground">Belum ada pengeluaran</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                    {recentExpenses.map((expense) => (
+                      <div
+                        key={expense.id}
+                        className="flex items-center justify-between p-3 rounded-xl bg-destructive/5 border border-destructive/20 hover:bg-destructive/10 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/20">
+                            <span className="text-lg">{categoryIcons[expense.category] || '💰'}</span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm truncate">
+                              {expense.subcategory}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {expense.description || expense.category}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(parseISO(expense.date), 'd MMM yyyy', { locale: id })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-sm text-destructive whitespace-nowrap">
+                            -{formatCurrency(Number(expense.amount))}
+                          </p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openEditModal(expense)}
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Hapus Pengeluaran?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Anda akan menghapus pengeluaran {expense.subcategory} sebesar{' '}
+                                  {formatCurrency(Number(expense.amount))}. Tindakan ini tidak dapat dibatalkan.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Batal</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteExpense(expense.id, (expense as any).payment_method_id, Number(expense.amount))}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Hapus
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </Layout>
+      <EditTransactionModal
+        transaction={editingTransaction}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingTransaction(null);
+        }}
+        onSave={handleEditTransaction}
+      />
+    </>
+  );
+}
