@@ -20,9 +20,11 @@ import { useSupabaseFinanceData } from '@/hooks/useSupabaseFinanceData';
 import { useProfileSettings } from '@/hooks/useProfileSettings';
 import { useMoneyTransfers } from '@/hooks/useMoneyTransfers';
 import { useDailyExpenseData } from '@/hooks/useDailyExpenseData';
+import { useIncomeTargets } from '@/hooks/useIncomeTargets';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { IncomeTargetList } from '@/components/dashboard/IncomeTargetList';
 
 export default function Dashboard() {
   const { profile, isAdmin } = useAuthContext();
@@ -33,11 +35,12 @@ export default function Dashboard() {
     to: undefined,
   });
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  
+
   const { getMonthlyData, getMonthlySummary, expenses, isLoading } = useSupabaseFinanceData();
   const { paymentMethods, budgetSettings, adjustPaymentMethodBalance } = useProfileSettings();
+  const { incomeTargets } = useIncomeTargets();
   const { transfers, addTransfer, deleteTransfer } = useMoneyTransfers();
-  
+
   // Convert Supabase transactions to the format expected by useDailyExpenseData
   const expensesForDaily = expenses.map(e => ({
     id: e.id,
@@ -48,7 +51,7 @@ export default function Dashboard() {
     amount: Number(e.amount),
     createdAt: e.created_at,
   }));
-  
+
   const {
     dailyData,
     chartData,
@@ -59,7 +62,7 @@ export default function Dashboard() {
     exportToExcel,
   } = useDailyExpenseData(expensesForDaily, dailyFilter, customRange);
 
-  const monthlyData = getMonthlyData(currentDate);
+  const monthlyData = getMonthlyData(currentDate, budgetSettings);
   const monthlySummary = getMonthlySummary(6);
 
   const formatCurrency = (value: number) => {
@@ -207,7 +210,7 @@ export default function Dashboard() {
               onCustomRangeChange={setCustomRange}
               onExport={exportToExcel}
             />
-            
+
             {/* Stats summary */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div className="rounded-lg bg-secondary/50 p-3 text-center">
@@ -307,6 +310,13 @@ export default function Dashboard() {
               />
             </CardContent>
           </Card>
+
+          {/* Income Targets */}
+          <IncomeTargetList
+            incomeTargets={incomeTargets.filter(t => t.month === format(currentDate, 'yyyy-MM'))}
+            incomes={monthlyData.incomes}
+            totalIncome={monthlyData.totalIncome}
+          />
         </div>
 
         {/* Alerts */}
