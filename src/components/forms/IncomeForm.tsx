@@ -30,7 +30,7 @@ const incomeSchema = z.object({
   amount: z
     .number({ required_error: 'Nominal wajib diisi' })
     .min(1, 'Nominal harus lebih dari 0'),
-  payment_method_id: z.string().optional(),
+  payment_method_id: z.string({ required_error: 'Silakan pilih metode pembayaran terlebih dahulu.' }).min(1, 'Silakan pilih metode pembayaran terlebih dahulu.'),
 });
 
 type IncomeFormData = z.infer<typeof incomeSchema>;
@@ -42,7 +42,7 @@ interface IncomeFormProps {
     subcategory: IncomeSubcategory;
     description: string;
     amount: number;
-    payment_method_id?: string;
+    payment_method_id: string;
   }) => void;
   paymentMethods?: PaymentMethod[];
 }
@@ -226,7 +226,7 @@ export function IncomeForm({ onSubmit, paymentMethods = [] }: IncomeFormProps) {
             onValueChange={(value) => setValue('payment_method_id', value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Pilih metode (opsional)" />
+              <SelectValue placeholder="Pilih metode" />
             </SelectTrigger>
             <SelectContent>
               {paymentMethods.map((method) => (

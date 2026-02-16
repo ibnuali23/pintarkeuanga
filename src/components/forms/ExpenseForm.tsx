@@ -33,7 +33,7 @@ const expenseSchema = z.object({
   amount: z
     .number({ required_error: 'Nominal wajib diisi' })
     .min(1, 'Nominal harus lebih dari 0'),
-  payment_method_id: z.string().optional(),
+  payment_method_id: z.string({ required_error: 'Silakan pilih metode pembayaran terlebih dahulu.' }).min(1, 'Silakan pilih metode pembayaran terlebih dahulu.'),
 });
 
 type ExpenseFormData = z.infer<typeof expenseSchema>;
@@ -45,7 +45,7 @@ interface ExpenseFormProps {
     subcategory: string;
     description: string;
     amount: number;
-    payment_method_id?: string;
+    payment_method_id: string;
   }) => void;
   paymentMethods?: PaymentMethod[];
 }
@@ -91,7 +91,7 @@ export function ExpenseForm({ onSubmit, paymentMethods = [] }: ExpenseFormProps)
   const selectedPaymentMethod = watch('payment_method_id');
 
   // Get dynamic subcategories based on selected category
-  const availableSubcategories = selectedCategory 
+  const availableSubcategories = selectedCategory
     ? getExpenseSubcategories(selectedCategory)
     : [];
 
@@ -276,7 +276,7 @@ export function ExpenseForm({ onSubmit, paymentMethods = [] }: ExpenseFormProps)
             onValueChange={(value) => setValue('payment_method_id', value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Pilih metode (opsional)" />
+              <SelectValue placeholder="Pilih metode" />
             </SelectTrigger>
             <SelectContent>
               {paymentMethods.map((method) => (
