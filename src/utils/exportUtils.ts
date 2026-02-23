@@ -17,7 +17,8 @@ const formatCurrency = (value: number) => {
 export const exportToPDF = (
   transactions: Transaction[],
   period: string,
-  summary?: { totalIncome: number; totalExpense: number; balance: number }
+  summary?: { totalIncome: number; totalExpense: number; balance: number },
+  filename?: string
 ) => {
   const doc = new jsPDF();
 
@@ -40,6 +41,7 @@ export const exportToPDF = (
   const tableData = transactions.map((t) => [
     format(parseISO(t.date), 'dd MMM yyyy', { locale: id }),
     t.category,
+    t.subcategory || '-',
     t.description || '-',
     formatCurrency(t.amount),
     t.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
@@ -47,19 +49,21 @@ export const exportToPDF = (
 
   autoTable(doc, {
     startY: summary ? 60 : 40,
-    head: [['Tanggal', 'Kategori', 'Deskripsi', 'Jumlah', 'Tipe']],
+    head: [['Tanggal', 'Kategori', 'Subkategori', 'Deskripsi', 'Jumlah', 'Tipe']],
     body: tableData,
     theme: 'striped',
     headStyles: { fillColor: [79, 70, 229] }, // primary color
   });
 
-  doc.save(`Laporan_Keuangan_${period.replace(' ', '_')}.pdf`);
+  const finalFilename = filename || `Laporan_Keuangan_${period.replace(' ', '_')}.pdf`;
+  doc.save(finalFilename.endsWith('.pdf') ? finalFilename : `${finalFilename}.pdf`);
 };
 
 export const exportToExcel = (
   transactions: Transaction[],
   period: string,
-  summary?: { totalIncome: number; totalExpense: number; balance: number }
+  summary?: { totalIncome: number; totalExpense: number; balance: number },
+  filename?: string
 ) => {
   const incomeTrans = transactions.filter(t => t.type === 'income');
   const expenseTrans = transactions.filter(t => t.type === 'expense');
@@ -67,7 +71,7 @@ export const exportToExcel = (
   const mapData = (data: Transaction[]) => data.map(t => ({
     Tanggal: format(parseISO(t.date), 'yyyy-MM-dd'),
     Kategori: t.category,
-    Subkategori: t.subcategory,
+    Subkategori: t.subcategory || '-',
     Deskripsi: t.description || '-',
     Jumlah: t.amount,
   }));
@@ -87,12 +91,17 @@ export const exportToExcel = (
   }
 
   // Income Sheet
-  const wsIncome = XLSX.utils.json_to_sheet(mapData(incomeTrans));
-  XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
+  if (incomeTrans.length > 0) {
+    const wsIncome = XLSX.utils.json_to_sheet(mapData(incomeTrans));
+    XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
+  }
 
   // Expense Sheet
-  const wsExpense = XLSX.utils.json_to_sheet(mapData(expenseTrans));
-  XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
+  if (expenseTrans.length > 0) {
+    const wsExpense = XLSX.utils.json_to_sheet(mapData(expenseTrans));
+    XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
+  }
 
-  XLSX.writeFile(wb, `Laporan_Keuangan_${period.replace(' ', '_')}.xlsx`);
+  const finalFilename = filename || `Laporan_Keuangan_${period.replace(' ', '_')}.xlsx`;
+  XLSX.writeFile(wb, finalFilename.endsWith('.xlsx') ? finalFilename : `${finalFilename}.xlsx`);
 };

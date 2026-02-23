@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { BarChart3, ChevronLeft, ChevronRight, FileText, Save, FileSpreadsheet, FileOutput } from 'lucide-react';
+import { BarChart3, ChevronLeft, ChevronRight, FileText, Save, FileSpreadsheet, FileOutput, Filter } from 'lucide-react';
 import { exportToPDF, exportToExcel } from '@/utils/exportUtils';
 import { Layout } from '@/components/layout/Layout';
 import { useSupabaseFinanceData } from '@/hooks/useSupabaseFinanceData';
@@ -10,12 +10,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { MonthlyBarChart } from '@/components/dashboard/MonthlyBarChart';
 import { BudgetDonutChart } from '@/components/dashboard/BudgetDonutChart';
-import { BUDGET_PERCENTAGES, ExpenseCategory } from '@/types/finance';
+import { BUDGET_PERCENTAGES, ExpenseCategory, EXPENSE_CATEGORIES, EXPENSE_SUBCATEGORIES, INCOME_SUBCATEGORIES } from '@/types/finance';
 import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ReportPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [note, setNote] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
+
   const { getMonthlyData, getMonthlySummary, saveMonthlyNote, isLoading } = useSupabaseFinanceData();
 
   const monthlyData = getMonthlyData(currentDate);
@@ -25,6 +35,17 @@ export default function ReportPage() {
   useEffect(() => {
     setNote(monthlyData.monthNote);
   }, [monthlyData.monthNote]);
+
+  // Reset subcategory when category changes
+  useEffect(() => {
+    setSelectedSubcategory("all");
+  }, [selectedCategory]);
+
+  const availableSubcategories = useMemo(() => {
+    if (selectedCategory === "all") return [];
+    if (selectedCategory === "Pemasukan") return INCOME_SUBCATEGORIES;
+    return EXPENSE_SUBCATEGORIES[selectedCategory as ExpenseCategory] || [];
+  }, [selectedCategory]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -57,20 +78,62 @@ export default function ReportPage() {
     }
   };
 
+  const getFilteredData = () => {
+    let allTransactions = [...monthlyData.incomes, ...monthlyData.expenses];
+
+    if (selectedCategory !== "all") {
+      if (selectedCategory === "Pemasukan") {
+        allTransactions = allTransactions.filter(t => t.type === 'income');
+      } else {
+        allTransactions = allTransactions.filter(t => t.category === selectedCategory);
+      }
+    }
+
+    if (selectedSubcategory !== "all") {
+      allTransactions = allTransactions.filter(t => t.subcategory === selectedSubcategory);
+    }
+
+    const filteredTotalIncome = allTransactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const filteredTotalExpense = allTransactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    return {
+      transactions: allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+      summary: {
+        totalIncome: filteredTotalIncome,
+        totalExpense: filteredTotalExpense,
+        balance: filteredTotalIncome - filteredTotalExpense,
+      }
+    };
+  };
+
+  const getExportFilename = (extension: string) => {
+    const periodStr = format(currentDate, 'MMMM_yyyy', { locale: id });
+    let name = "Laporan";
+
+    if (selectedSubcategory !== "all") {
+      name = `Laporan_${selectedSubcategory.replace(/\s+/g, '')}`;
+    } else if (selectedCategory !== "all") {
+      name = `Laporan_${selectedCategory.replace(/\s+/g, '')}`;
+    } else {
+      name = "Laporan_Keuangan";
+    }
+
+    return `${name}_${periodStr}.${extension}`;
+  };
+
   const handleExportPDF = () => {
     const period = format(currentDate, 'MMMM yyyy', { locale: id });
-    const allTransactions = [...monthlyData.incomes, ...monthlyData.expenses].sort((a, b) =>
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-    const summary = {
-      totalIncome: monthlyData.totalIncome,
-      totalExpense: monthlyData.totalExpense,
-      balance: monthlyData.balance,
-    };
+    const { transactions, summary } = getFilteredData();
+    const filename = getExportFilename("pdf");
 
     toast.info('Menyiapkan PDF...');
     try {
-      exportToPDF(allTransactions, period, summary);
+      exportToPDF(transactions, period, summary, filename);
       toast.success('Ekspor PDF berhasil!');
     } catch (error) {
       console.error('PDF export error:', error);
@@ -80,16 +143,12 @@ export default function ReportPage() {
 
   const handleExportExcel = () => {
     const period = format(currentDate, 'MMMM yyyy', { locale: id });
-    const allTransactions = [...monthlyData.incomes, ...monthlyData.expenses];
-    const summary = {
-      totalIncome: monthlyData.totalIncome,
-      totalExpense: monthlyData.totalExpense,
-      balance: monthlyData.balance,
-    };
+    const { transactions, summary } = getFilteredData();
+    const filename = getExportFilename("xlsx");
 
     toast.info('Menyiapkan Excel...');
     try {
-      exportToExcel(allTransactions, period, summary);
+      exportToExcel(transactions, period, summary, filename);
       toast.success('Ekspor Excel berhasil!');
     } catch (error) {
       console.error('Excel export error:', error);
@@ -137,23 +196,26 @@ export default function ReportPage() {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
-            <BarChart3 className="h-5 w-5" />
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div className="flex items-center gap-3 flex-1">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
+              <BarChart3 className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
+                Laporan Bulanan
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                Analisis keuangan dan evaluasi pengeluaran
+              </p>
+            </div>
           </div>
-          <div className="flex-1">
-            <h1 className="font-serif text-2xl md:text-3xl font-bold text-foreground">
-              Laporan Bulanan
-            </h1>
-            <p className="text-muted-foreground">
-              Analisis keuangan dan evaluasi pengeluaran
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
+
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="gap-2"
+              className="gap-2 h-9"
               onClick={handleExportPDF}
             >
               <FileOutput className="h-4 w-4" />
@@ -162,7 +224,7 @@ export default function ReportPage() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-2"
+              className="gap-2 h-9"
               onClick={handleExportExcel}
             >
               <FileSpreadsheet className="h-4 w-4" />
@@ -170,6 +232,60 @@ export default function ReportPage() {
             </Button>
           </div>
         </div>
+
+        {/* Filters */}
+        <Card className="glass-card">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row items-end gap-4">
+              <div className="grid gap-2 w-full sm:w-auto sm:min-w-[200px]">
+                <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 leading-none">
+                  <Filter className="h-3 w-3" />
+                  Filter Kategori
+                </label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="bg-background/50 h-9">
+                    <SelectValue placeholder="Semua Kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kategori</SelectItem>
+                    <SelectItem value="Pemasukan">Pemasukan</SelectItem>
+                    {EXPENSE_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-2 w-full sm:w-auto sm:min-w-[200px]">
+                <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 leading-none">
+                  <Filter className="h-3 w-3" />
+                  Filter Subkategori
+                </label>
+                <Select
+                  value={selectedSubcategory}
+                  onValueChange={setSelectedSubcategory}
+                  disabled={selectedCategory === "all"}
+                >
+                  <SelectTrigger className="bg-background/50 h-9">
+                    <SelectValue placeholder="Semua Subkategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Subkategori</SelectItem>
+                    {availableSubcategories.map((sub) => (
+                      <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex-1" />
+
+              <div className="text-xs text-muted-foreground italic mb-2">
+                * Filter berlaku untuk hasil export
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Month selector */}
         <div className="flex items-center justify-center gap-4">
