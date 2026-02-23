@@ -10,7 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { MonthlyBarChart } from '@/components/dashboard/MonthlyBarChart';
 import { BudgetDonutChart } from '@/components/dashboard/BudgetDonutChart';
-import { BUDGET_PERCENTAGES, ExpenseCategory, EXPENSE_CATEGORIES, EXPENSE_SUBCATEGORIES, INCOME_SUBCATEGORIES } from '@/types/finance';
+import { BUDGET_PERCENTAGES, ExpenseCategory } from '@/types/finance';
+import { useDynamicCategories } from '@/hooks/useDynamicCategories';
 import { toast } from 'sonner';
 import {
   Select,
@@ -26,7 +27,10 @@ export default function ReportPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
 
-  const { getMonthlyData, getMonthlySummary, saveMonthlyNote, isLoading } = useSupabaseFinanceData();
+  const { getMonthlyData, getMonthlySummary, saveMonthlyNote, isLoading: isDataLoading } = useSupabaseFinanceData();
+  const { expenseCategories, incomeSubcategories, isLoading: isCategoriesLoading } = useDynamicCategories();
+
+  const isLoading = isDataLoading || isCategoriesLoading;
 
   const monthlyData = getMonthlyData(currentDate);
   const monthlySummary = getMonthlySummary(6);
@@ -43,9 +47,10 @@ export default function ReportPage() {
 
   const availableSubcategories = useMemo(() => {
     if (selectedCategory === "all") return [];
-    if (selectedCategory === "Pemasukan") return INCOME_SUBCATEGORIES;
-    return EXPENSE_SUBCATEGORIES[selectedCategory as ExpenseCategory] || [];
-  }, [selectedCategory]);
+    if (selectedCategory === "Pemasukan") return incomeSubcategories;
+    const catData = expenseCategories.find(c => c.category === selectedCategory);
+    return catData?.subcategories || [];
+  }, [selectedCategory, expenseCategories, incomeSubcategories]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -249,8 +254,8 @@ export default function ReportPage() {
                   <SelectContent>
                     <SelectItem value="all">Semua Kategori</SelectItem>
                     <SelectItem value="Pemasukan">Pemasukan</SelectItem>
-                    {EXPENSE_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    {expenseCategories.map((cat) => (
+                      <SelectItem key={cat.category} value={cat.category}>{cat.category}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
