@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { BarChart3, ChevronLeft, ChevronRight, FileText, Save, FileSpreadsheet, FileOutput, Filter } from 'lucide-react';
-import { exportToPDF, exportToExcel } from '@/utils/exportUtils';
+import { BarChart3, ChevronLeft, ChevronRight, FileText, Save, FileSpreadsheet, FileOutput, Filter, CloudUpload, Loader2 } from 'lucide-react';
+import { exportToPDF, exportToExcel, exportToPDFBase64, exportToExcelBase64 } from '@/utils/exportUtils';
+import { saveToGoogleDrive } from '@/utils/googleDrive';
 import { Layout } from '@/components/layout/Layout';
 import { useSupabaseFinanceData } from '@/hooks/useSupabaseFinanceData';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from '@/hooks/useAuth';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
 export default function ReportPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -29,6 +38,9 @@ export default function ReportPage() {
 
   const { getMonthlyData, getMonthlySummary, saveMonthlyNote, isLoading: isDataLoading } = useSupabaseFinanceData();
   const { expenseCategories, incomeSubcategories, isLoading: isCategoriesLoading } = useDynamicCategories();
+  const { isAuthenticated } = useAuth();
+  const { getAccessToken, isTokenLoading } = useGoogleAuth();
+  const [isUploading, setIsUploading] = useState(false);
 
   const isLoading = isDataLoading || isCategoriesLoading;
 
@@ -161,6 +173,78 @@ export default function ReportPage() {
     }
   };
 
+  const handleSaveToDrive = async (formatType: 'pdf' | 'excel') => {
+    if (!isAuthenticated) {
+      toast.error('Gagal menyimpan ke Drive. Silakan login terlebih dahulu.');
+      return;
+    }
+
+    const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+    if (!scriptUrl) {
+      toast.error('Konfigurasi Google Drive belum diatur.');
+      return;
+    }
+
+    try {
+      const accessToken = await getAccessToken();
+
+      const period = format(currentDate, 'MMMM yyyy', { locale: id });
+      const { transactions, summary } = getFilteredData();
+      const filename = getExportFilename(formatType);
+
+      setIsUploading(true);
+      toast.loading(`Menyimpan ${formatType.toUpperCase()} ke Google Drive...`, { id: 'drive-upload' });
+
+      let base64Content = '';
+      let mimeType = '';
+
+      if (formatType === 'pdf') {
+        const dataUri = exportToPDFBase64(transactions, period, summary, filename);
+        base64Content = dataUri.split('base64,')[1] || dataUri;
+        mimeType = 'application/pdf';
+      } else {
+        base64Content = exportToExcelBase64(transactions, period, summary);
+        mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      }
+
+      const result = await saveToGoogleDrive({
+        filename,
+        content: base64Content,
+        accessToken,
+        mimeType,
+      });
+
+      if (result && result.url) {
+        toast.dismiss('drive-upload');
+        toast.success(
+          <div className="flex flex-col gap-1">
+            <span>File berhasil disimpan ke Google Drive!</span>
+            <a
+              href={result.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline text-sm"
+            >
+              Buka File
+            </a>
+          </div>
+        );
+      } else {
+        throw new Error('URL file tidak dikembalikan oleh server.');
+      }
+    } catch (error: any) {
+      console.error('Drive upload error:', error);
+      toast.dismiss('drive-upload');
+      if (error && error.error === 'access_denied') {
+        toast.error('Akses ke Google Drive dibatalkan oleh pengguna.');
+      } else {
+        toast.error('Gagal menyimpan ke Drive. Periksa koneksi atau izin akses.');
+      }
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <Layout>
@@ -235,6 +319,34 @@ export default function ReportPage() {
               <FileSpreadsheet className="h-4 w-4" />
               Export Excel
             </Button>
+
+            {isAuthenticated && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="gap-2 h-9"
+                    disabled={isUploading || isTokenLoading}
+                  >
+                    {isUploading || isTokenLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CloudUpload className="h-4 w-4" />
+                    )}
+                    Simpan ke Google Drive
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleSaveToDrive('pdf')}>
+                    Format PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSaveToDrive('excel')}>
+                    Format Excel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
 
