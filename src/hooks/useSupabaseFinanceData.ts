@@ -278,7 +278,8 @@ export function useSupabaseFinanceData() {
             if (categoryBudgets.length > 0) {
               limit = categoryBudgets.reduce((sum, b) => sum + b.monthly_budget, 0);
               isBudgetSet = true;
-              targetPercentage = totalIncome > 0 ? (limit / totalIncome) * 100 : 0;
+              // Always use the default percentage (50-30-15-5) for display
+              targetPercentage = BUDGET_PERCENTAGES[category];
             }
           }
 
