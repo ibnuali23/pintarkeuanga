@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { SyncStatus } from './SyncStatus';
 import { UserMenu } from './UserMenu';
+import logoImg from '@/assets/logo.jpg';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
