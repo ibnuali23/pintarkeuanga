@@ -14,60 +14,75 @@ import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import DebtPage from "./pages/DebtPage";
+import FinancialInsightsPage from "./pages/FinancialInsightsPage";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-            
-            {/* Protected routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/income" element={
-              <ProtectedRoute>
-                <IncomePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/expense" element={
-              <ProtectedRoute>
-                <ExpensePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/report" element={
-              <ProtectedRoute>
-                <ReportPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin" element={
-              <ProtectedRoute requireAdmin>
-                <AdminPage />
-              </ProtectedRoute>
-            } />
-            
-            {/* Catch-all */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+
+              {/* Protected routes */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/income" element={
+                <ProtectedRoute>
+                  <IncomePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/expense" element={
+                <ProtectedRoute>
+                  <ExpensePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/report" element={
+                <ProtectedRoute>
+                  <ReportPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute requireAdmin>
+                  <AdminPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/debt" element={
+                <ProtectedRoute>
+                  <DebtPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/insights" element={
+                <ProtectedRoute>
+                  <FinancialInsightsPage />
+                </ProtectedRoute>
+              } />
+
+              {/* Catch-all */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;

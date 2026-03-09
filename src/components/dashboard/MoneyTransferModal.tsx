@@ -49,10 +49,11 @@ interface MoneyTransferModalProps {
     from_method_id: string;
     to_method_id: string;
     amount: number;
-    description?: string;
     date: string;
+    description: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) => Promise<{ error?: Error; data?: any }>;
-  onUpdateBalance: (id: string, amount: number, isIncome: boolean) => Promise<{ error?: Error }>;
+  onUpdateBalance: (id: string, amount: number, isIncome: boolean) => Promise<any>;
 }
 
 const methodIcons: Record<string, string> = {
@@ -122,7 +123,7 @@ export function MoneyTransferModal({
 
   const onFormSubmit = async (data: TransferFormData) => {
     if (!fromMethod) return;
-    
+
     // Validate sufficient balance
     if (Number(fromMethod.balance) < data.amount) {
       toast.error('Saldo tidak cukup', {

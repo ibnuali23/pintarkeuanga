@@ -31,11 +31,13 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
     return value.toString();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
           <p className="font-semibold mb-2">{label}</p>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {payload.map((item: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: item.color }}>
               {item.name}:{' '}

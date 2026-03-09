@@ -31,6 +31,7 @@ export function BudgetDonutChart({ categorySpending, totalExpense }: BudgetDonut
     }).format(value);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -38,14 +39,14 @@ export function BudgetDonutChart({ categorySpending, totalExpense }: BudgetDonut
         data.percentage > data.target
           ? 'Melebihi Batas!'
           : data.percentage > data.target * 0.8
-          ? 'Mendekati Batas'
-          : 'Aman';
+            ? 'Mendekati Batas'
+            : 'Aman';
       const statusColor =
         data.percentage > data.target
           ? 'text-destructive'
           : data.percentage > data.target * 0.8
-          ? 'text-warning'
-          : 'text-success';
+            ? 'text-warning'
+            : 'text-success';
 
       return (
         <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
@@ -61,10 +62,12 @@ export function BudgetDonutChart({ categorySpending, totalExpense }: BudgetDonut
     return null;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderLegend = (props: any) => {
     const { payload } = props;
     return (
       <div className="flex flex-wrap justify-center gap-3 mt-4">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2">
             <div

@@ -29,6 +29,7 @@ export function DailyExpenseChart({ data }: DailyExpenseChartProps) {
     return value.toString();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const dataPoint = data.find(d => d.dateLabel === label);

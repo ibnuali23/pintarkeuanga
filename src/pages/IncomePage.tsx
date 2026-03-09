@@ -39,6 +39,7 @@ export default function IncomePage() {
     }).format(value);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAddIncome = async (income: any) => {
     const result = await addIncome(income);
     if (result.error) {
@@ -233,6 +234,7 @@ export default function IncomePage() {
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Batal</AlertDialogCancel>
                                 <AlertDialogAction
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                   onClick={() => handleDeleteIncome(income.id, (income as any).payment_method_id, Number(income.amount))}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >

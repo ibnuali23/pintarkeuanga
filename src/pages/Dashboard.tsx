@@ -45,6 +45,7 @@ export default function Dashboard() {
   const expensesForDaily = expenses.map(e => ({
     id: e.id,
     date: e.date,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     category: e.category as any,
     subcategory: e.subcategory,
     description: e.description || '',

@@ -18,8 +18,11 @@ declare namespace google {
         namespace oauth2 {
             interface TokenClientConfig {
                 client_id: string;
-                scope: string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 callback: (response: any) => void;
+                auto_select?: boolean;
+                cancel_on_tap_outside?: boolean;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 error_callback?: (error: any) => void;
             }
             interface TokenClient {

@@ -167,7 +167,8 @@ export default function ReportPage() {
     try {
       exportToExcel(transactions, period, summary, filename);
       toast.success('Ekspor Excel berhasil!');
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error('Excel export error:', error);
       toast.error('Gagal mengekspor Excel');
     }

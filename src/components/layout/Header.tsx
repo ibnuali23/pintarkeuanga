@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, TrendingDown, BarChart3, Menu, X } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, TrendingDown, BarChart3, Menu, X, BookUser, Lightbulb, Palette, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/components/ThemeProvider';
 import { SyncStatus } from './SyncStatus';
 import { UserMenu } from './UserMenu';
 import logoImg from '@/assets/logo.jpg';
@@ -10,12 +11,22 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Pemasukan', href: '/income', icon: TrendingUp },
   { name: 'Pengeluaran', href: '/expense', icon: TrendingDown },
+  { name: 'Hutang Piutang', href: '/debt', icon: BookUser },
   { name: 'Laporan', href: '/report', icon: BarChart3 },
+  { name: 'Insights', href: '/insights', icon: Lightbulb },
 ];
 
 export function Header() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  const cycleTheme = () => {
+    const themes: ('light' | 'dark' | 'finance-green' | 'midnight-blue')[] = ['light', 'dark', 'finance-green', 'midnight-blue'];
+    const currentIndex = themes.indexOf(theme);
+    const nextIndex = (currentIndex + 1) % themes.length;
+    setTheme(themes[nextIndex]);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-card/80 backdrop-blur-xl">
@@ -53,9 +64,19 @@ export function Header() {
 
         {/* Right side: Sync Status & User Menu */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={cycleTheme}
+            className="p-2 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            title="Ganti Tema"
+          >
+            {theme === 'light' ? <Sun className="h-5 w-5" /> :
+              theme === 'dark' ? <Moon className="h-5 w-5" /> :
+                <Palette className="h-5 w-5" />}
+          </button>
+
           <SyncStatus />
           <UserMenu />
-          
+
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

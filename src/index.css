@@ -121,6 +121,106 @@
     --sidebar-border: 168 20% 20%;
     --sidebar-ring: 168 70% 45%;
   }
+
+  .finance-green {
+    --background: 142 50% 98%;
+    --foreground: 142 50% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 142 50% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 142 50% 10%;
+
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 142 30% 90%;
+    --secondary-foreground: 142 76% 30%;
+
+    --muted: 142 20% 94%;
+    --muted-foreground: 142 20% 45%;
+
+    --accent: 43 74% 49%;
+    --accent-foreground: 43 90% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 90% 15%;
+
+    --border: 142 20% 88%;
+    --input: 142 20% 88%;
+    --ring: 142 76% 36%;
+
+    --chart-kebutuhan: 142 76% 36%;
+    --chart-investasi: 43 74% 49%;
+    --chart-keinginan: 280 65% 60%;
+    --chart-darurat: 200 70% 50%;
+
+    --sidebar-background: 142 30% 96%;
+    --sidebar-foreground: 142 50% 20%;
+    --sidebar-primary: 142 76% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 30% 90%;
+    --sidebar-accent-foreground: 142 50% 20%;
+    --sidebar-border: 142 20% 88%;
+    --sidebar-ring: 142 76% 36%;
+  }
+
+  .midnight-blue {
+    --background: 220 50% 8%;
+    --foreground: 220 15% 95%;
+
+    --card: 220 40% 12%;
+    --card-foreground: 220 15% 95%;
+
+    --popover: 220 40% 12%;
+    --popover-foreground: 220 15% 95%;
+
+    --primary: 210 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 40% 20%;
+    --secondary-foreground: 220 15% 90%;
+
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 15% 60%;
+
+    --accent: 43 70% 50%;
+    --accent-foreground: 43 90% 10%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 70% 45%;
+    --success-foreground: 142 90% 10%;
+
+    --warning: 38 85% 55%;
+    --warning-foreground: 38 90% 10%;
+
+    --border: 220 30% 20%;
+    --input: 220 30% 20%;
+    --ring: 210 80% 50%;
+
+    --chart-kebutuhan: 210 80% 50%;
+    --chart-investasi: 43 70% 55%;
+    --chart-keinginan: 280 60% 65%;
+    --chart-darurat: 200 65% 55%;
+
+    --sidebar-background: 220 50% 10%;
+    --sidebar-foreground: 220 15% 95%;
+    --sidebar-primary: 210 80% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 40% 20%;
+    --sidebar-accent-foreground: 220 15% 90%;
+    --sidebar-border: 220 30% 20%;
+    --sidebar-ring: 210 80% 50%;
+  }
 }
 
 @layer base {

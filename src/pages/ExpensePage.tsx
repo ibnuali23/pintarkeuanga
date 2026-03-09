@@ -46,6 +46,7 @@ export default function ExpensePage() {
     }).format(value);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAddExpense = async (expense: any) => {
     const result = await addExpense(expense);
     if (result.error) {
@@ -240,6 +241,7 @@ export default function ExpensePage() {
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Batal</AlertDialogCancel>
                                 <AlertDialogAction
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                   onClick={() => handleDeleteExpense(expense.id, (expense as any).payment_method_id, Number(expense.amount))}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
