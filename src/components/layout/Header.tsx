@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/ThemeProvider';
 import { SyncStatus } from './SyncStatus';
 import { UserMenu } from './UserMenu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import logoImg from '@/assets/logo.jpg';
 
 const navigation = [
@@ -19,8 +20,18 @@ const navigation = [
 
 export function Header() {
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  // Find current navigation item
+  const currentNavItem = navigation.find(item => item.href === location.pathname);
+
+  // Handle routes not in the main navigation
+  let pageTitle = currentNavItem?.name;
+  if (!pageTitle) {
+    if (location.pathname === '/profile') pageTitle = 'Profil Saya';
+    if (location.pathname === '/admin') pageTitle = 'Panel Admin';
+  }
 
   const cycleTheme = () => {
     const themes: ('light' | 'dark' | 'finance-green' | 'midnight-blue')[] = ['light', 'dark', 'finance-green', 'midnight-blue'];
@@ -32,42 +43,76 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-card/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-3">
-          <img src={logoImg} alt="Pintar Keuangan Logo" className="h-10 w-10 rounded-xl shadow-elegant object-contain" />
-          <div className="hidden sm:block">
-            <h1 className="font-serif text-lg font-semibold text-foreground">
-              Pintar Keuangan
-            </h1>
-          </div>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navigation.map((item) => {
-            const isActive = location.pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-                  isActive
-                    ? 'bg-primary text-primary-foreground shadow-elegant'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                )}
+        <div className="flex items-center gap-4">
+          {/* Hamburger Menu & Navigation Drawer */}
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <button
+                className="p-2 rounded-lg hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+                aria-label="Menu"
               >
-                <item.icon className="h-4 w-4" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
+                <Menu className="h-6 w-6" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] border-r-border/50 bg-card/95 backdrop-blur-2xl p-0">
+              <SheetHeader className="p-6 border-b border-border/50">
+                <SheetTitle className="flex items-center gap-3">
+                  <img src={logoImg} alt="Logo" className="h-8 w-8 rounded-lg object-contain" />
+                  <span className="font-serif text-xl font-bold">Pintar Keuangan</span>
+                </SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-1 p-4 overflow-y-auto max-h-[calc(100vh-80px)]">
+                {navigation.map((item) => {
+                  const isActive = location.pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        'flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300',
+                        isActive
+                          ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+                      )}
+                    >
+                      <item.icon className={cn("h-5 w-5", isActive ? "text-primary-foreground" : "text-primary")} />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
 
-        {/* Right side: Sync Status & User Menu */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <img src={logoImg} alt="Pintar Keuangan Logo" className="h-10 w-10 rounded-xl shadow-elegant object-contain group-hover:scale-105 transition-transform duration-300" />
+            <div className="flex items-center gap-2">
+              <div className="hidden xs:block">
+                <h1 className="font-serif text-lg font-semibold text-foreground tracking-tight">
+                  Pintar Keuangan
+                </h1>
+              </div>
+
+              {pageTitle && (
+                <>
+                  <span className="text-muted-foreground/30 font-light select-none hidden xs:block">|</span>
+                  <span className="font-medium text-primary animate-fade-in truncate max-w-[120px] sm:max-w-none">
+                    {pageTitle}
+                  </span>
+                </>
+              )}
+            </div>
+          </Link>
+        </div>
+
+        {/* Desktop Navigation - Space is now clean, horizontal nav removed */}
+
+        {/* Right side: Theme, Sync Status & User Menu */}
         <div className="flex items-center gap-2">
           <button
             onClick={cycleTheme}
-            className="p-2 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-300 active:scale-95"
             title="Ganti Tema"
           >
             {theme === 'light' ? <Sun className="h-5 w-5" /> :
@@ -77,43 +122,8 @@ export function Header() {
 
           <SyncStatus />
           <UserMenu />
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
       </div>
-
-      {/* Mobile Navigation */}
-      {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl animate-fade-in">
-          <div className="container py-4 space-y-1">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200',
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-      )}
     </header>
   );
 }
