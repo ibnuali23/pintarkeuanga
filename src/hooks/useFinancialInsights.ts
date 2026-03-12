@@ -113,7 +113,7 @@ export function useFinancialInsights() {
         // 4. Emergency Fund Recommendation
         // Assuming user is single for now (factor = 3). Next iteration could pull this from profile.
         const emergencyFactor = 3;
-        const recommendedEmergencyFund = totalExpense * emergencyFactor;
+        const recommendedEmergencyFund = essentialExpense * emergencyFactor;
         const emergencyProgress = recommendedEmergencyFund > 0 ? (emergencyFunds / recommendedEmergencyFund) * 100 : 0;
 
         // 5. Retirement Fund Recommendation
