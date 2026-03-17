@@ -13,7 +13,6 @@ import { MonthlyBarChart } from '@/components/dashboard/MonthlyBarChart';
 import { BudgetDonutChart } from '@/components/dashboard/BudgetDonutChart';
 import { useDynamicCategories } from '@/hooks/useDynamicCategories';
 import { useExpenseCategories } from '@/hooks/useExpenseCategories';
-import { useDynamicCategories } from '@/hooks/useDynamicCategories';
 import { toast } from 'sonner';
 import {
   Select,
