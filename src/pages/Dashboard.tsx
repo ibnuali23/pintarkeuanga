@@ -40,6 +40,7 @@ export default function Dashboard() {
   const { getMonthlyData, getMonthlySummary, expenses, isLoading } = useSupabaseFinanceData();
   const { paymentMethods, budgetSettings, adjustPaymentMethodBalance } = useProfileSettings();
   const { incomeTargets } = useIncomeTargets();
+  const { budgetPercentages, categoryIcons: expCategoryIcons } = useExpenseCategories();
   const { transfers, addTransfer, deleteTransfer } = useMoneyTransfers();
 
   // Convert Supabase transactions to the format expected by useDailyExpenseData
