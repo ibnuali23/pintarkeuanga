@@ -297,6 +297,7 @@ export default function Dashboard() {
               <BudgetStatusList
                 budgetStatus={monthlyData.budgetStatus}
                 totalIncome={monthlyData.totalIncome}
+                categoryIcons={expCategoryIcons}
               />
             </CardContent>
           </Card>
