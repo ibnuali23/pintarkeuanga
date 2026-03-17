@@ -39,6 +39,7 @@ export default function ReportPage() {
 
   const { getMonthlyData, getMonthlySummary, saveMonthlyNote, isLoading: isDataLoading } = useSupabaseFinanceData();
   const { expenseCategories, incomeSubcategories, isLoading: isCategoriesLoading } = useDynamicCategories();
+  const { budgetPercentages, categoryIcons: expCategoryIcons } = useExpenseCategories();
   const { isAuthenticated } = useAuth();
   const { getAccessToken, isTokenLoading } = useGoogleAuth();
   const [isUploading, setIsUploading] = useState(false);
