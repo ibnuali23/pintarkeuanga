@@ -262,9 +262,10 @@ export default function ReportPage() {
   }
 
   const getCategoryData = () => {
-    return (Object.keys(BUDGET_PERCENTAGES) as ExpenseCategory[]).map((category) => {
-      const spent = monthlyData.categorySpending[category];
-      const target = BUDGET_PERCENTAGES[category];
+    const categories = Object.keys(budgetPercentages);
+    return categories.map((category) => {
+      const spent = monthlyData.categorySpending[category] || 0;
+      const target = budgetPercentages[category] || 0;
       const spentPercentage = monthlyData.totalExpense > 0
         ? (spent / monthlyData.totalExpense) * 100
         : 0;
