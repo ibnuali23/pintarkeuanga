@@ -22,6 +22,7 @@ import { useMoneyTransfers } from '@/hooks/useMoneyTransfers';
 import { useDailyExpenseData } from '@/hooks/useDailyExpenseData';
 import { useIncomeTargets } from '@/hooks/useIncomeTargets';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useExpenseCategories } from '@/hooks/useExpenseCategories';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { IncomeTargetList } from '@/components/dashboard/IncomeTargetList';
