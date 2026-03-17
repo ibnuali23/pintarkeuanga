@@ -65,7 +65,7 @@ export default function Dashboard() {
     exportToExcel,
   } = useDailyExpenseData(expensesForDaily, dailyFilter, customRange);
 
-  const monthlyData = getMonthlyData(currentDate, budgetSettings);
+  const monthlyData = getMonthlyData(currentDate, budgetSettings, budgetPercentages);
   const monthlySummary = getMonthlySummary(6);
 
   const formatCurrency = (value: number) => {
