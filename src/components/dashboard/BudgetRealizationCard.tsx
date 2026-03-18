@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { BudgetSetting } from '@/hooks/useProfileSettings';
 import { Transaction } from '@/hooks/useSupabaseFinanceData';
+import { useDynamicCategories } from '@/hooks/useDynamicCategories';
 import { cn } from '@/lib/utils';
 
 interface BudgetRealizationCardProps {
