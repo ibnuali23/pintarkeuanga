@@ -27,6 +27,7 @@ import {
 export default function ExpensePage() {
   const { expenses, addExpense, deleteExpense, updateTransaction, isLoading } = useSupabaseFinanceData();
   const { paymentMethods, adjustPaymentMethodBalance } = useProfileSettings();
+  const { categoryIcons } = useExpenseCategories();
   const { toast } = useToast();
 
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
