@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { ExpenseForm } from '@/components/forms/ExpenseForm';
 import { useSupabaseFinanceData, Transaction } from '@/hooks/useSupabaseFinanceData';
-import { useExpenseCategories } from '@/hooks/useExpenseCategories';
 import { useProfileSettings } from '@/hooks/useProfileSettings';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { TrendingDown, History, Trash2, Edit2 } from 'lucide-react';
@@ -23,11 +22,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
+const categoryIcons: Record<string, string> = {
+  Kebutuhan: '🏠',
+  Investasi: '📈',
+  Keinginan: '🎁',
+  'Dana Darurat': '🛡️',
+};
 
 export default function ExpensePage() {
   const { expenses, addExpense, deleteExpense, updateTransaction, isLoading } = useSupabaseFinanceData();
   const { paymentMethods, adjustPaymentMethodBalance } = useProfileSettings();
-  const { categoryIcons } = useExpenseCategories();
   const { toast } = useToast();
 
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);

@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/select';
 import { BudgetSetting } from '@/hooks/useProfileSettings';
 import { Transaction } from '@/hooks/useSupabaseFinanceData';
-import { useDynamicCategories } from '@/hooks/useDynamicCategories';
 import { cn } from '@/lib/utils';
 
 interface BudgetRealizationCardProps {
@@ -24,7 +23,6 @@ interface BudgetRealizationCardProps {
 
 export function BudgetRealizationCard({ budgetSettings, expenses }: BudgetRealizationCardProps) {
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
-  const { getExpenseSubcategories, categoryNames } = useDynamicCategories();
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -62,21 +60,13 @@ export function BudgetRealizationCard({ budgetSettings, expenses }: BudgetRealiz
     subcategorySpending.set(key, (subcategorySpending.get(key) || 0) + Number(exp.amount));
   });
 
-  // Filter budget settings for selected month, and exclude deleted subcategories
-  const allValidSubcategories = new Set<string>();
-  categoryNames.forEach(cat => {
-    getExpenseSubcategories(cat).forEach(sub => allValidSubcategories.add(`${cat}|${sub}`));
-  });
-
+  // Filter budget settings for selected month only
   const filteredBudgets = budgetSettings.filter((b) => {
     if (!b.month) return false;
-    if (b.month !== selectedMonth) return false;
-    // Filter out subcategories that no longer exist
-    const key = `${b.category}|${b.subcategory}`;
-    return allValidSubcategories.has(key);
+    return b.month === selectedMonth;
   });
 
-  // Calculate realization for each budget, filtering out subcategories that no longer exist in transactions or have data
+  // Calculate realization for each budget
   const realizations = filteredBudgets
     .filter((b) => b.monthly_budget > 0)
     .map((budget) => {
