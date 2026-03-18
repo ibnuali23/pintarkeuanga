@@ -46,10 +46,10 @@ export function useDynamicCategories() {
   }, [customCategories]);
 
   // Get subcategories for a specific expense category
-  const getExpenseSubcategories = (category: string): string[] => {
+  const getExpenseSubcategories = useCallback((category: string): string[] => {
     const categoryData = expenseCategories.find(c => c.category === category);
     return categoryData?.subcategories || [];
-  };
+  }, [expenseCategories]);
 
   // Get all custom categories (for display in settings)
   const getCustomCategoriesByType = (type: 'income' | 'expense'): CustomCategory[] => {
