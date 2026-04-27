@@ -38,13 +38,13 @@ export function FloatingActionButton() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300',
+          'flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300',
           isOpen
             ? 'bg-muted text-muted-foreground rotate-45'
             : 'gradient-primary text-primary-foreground'
         )}
       >
-        {isOpen ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
+        {isOpen ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
       </button>
     </div>
   );

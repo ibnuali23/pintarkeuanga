@@ -42,16 +42,16 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-card/80 backdrop-blur-xl">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="container flex h-14 md:h-16 items-center justify-between">
+        <div className="flex items-center gap-2 md:gap-4 min-w-0">
           {/* Hamburger Menu & Navigation Drawer */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <button
-                className="p-2 rounded-lg hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+                className="p-1.5 md:p-2 rounded-lg hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
                 aria-label="Menu"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5 md:h-6 md:w-6" />
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] border-r-border/50 bg-card/95 backdrop-blur-2xl p-0">
@@ -85,19 +85,19 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex items-center gap-3 group">
-            <img src={logoImg} alt="Pintar Keuangan Logo" className="h-10 w-10 rounded-xl shadow-elegant object-contain group-hover:scale-105 transition-transform duration-300" />
-            <div className="flex items-center gap-2">
-              <div className="hidden xs:block">
-                <h1 className="font-serif text-lg font-semibold text-foreground tracking-tight">
+          <Link to="/" className="flex items-center gap-2 md:gap-3 group min-w-0">
+            <img src={logoImg} alt="Pintar Keuangan Logo" className="h-8 w-8 md:h-10 md:w-10 rounded-xl shadow-elegant object-contain group-hover:scale-105 transition-transform duration-300 shrink-0" />
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="hidden md:block">
+                <h1 className="font-serif text-base md:text-lg font-semibold text-foreground tracking-tight">
                   Pintar Keuangan
                 </h1>
               </div>
 
               {pageTitle && (
                 <>
-                  <span className="text-muted-foreground/30 font-light select-none hidden xs:block">|</span>
-                  <span className="font-medium text-primary animate-fade-in truncate max-w-[120px] sm:max-w-none">
+                  <span className="text-muted-foreground/30 font-light select-none hidden md:block">|</span>
+                  <span className="font-medium text-sm md:text-base text-primary animate-fade-in truncate max-w-[160px] sm:max-w-none">
                     {pageTitle}
                   </span>
                 </>
@@ -109,15 +109,15 @@ export function Header() {
         {/* Desktop Navigation - Space is now clean, horizontal nav removed */}
 
         {/* Right side: Theme, Sync Status & User Menu */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2 shrink-0">
           <button
             onClick={cycleTheme}
-            className="p-2 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-300 active:scale-95"
+            className="p-1.5 md:p-2 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-300 active:scale-95"
             title="Ganti Tema"
           >
-            {theme === 'light' ? <Sun className="h-5 w-5" /> :
-              theme === 'dark' ? <Moon className="h-5 w-5" /> :
-                <Palette className="h-5 w-5" />}
+            {theme === 'light' ? <Sun className="h-4 w-4 md:h-5 md:w-5" /> :
+              theme === 'dark' ? <Moon className="h-4 w-4 md:h-5 md:w-5" /> :
+                <Palette className="h-4 w-4 md:h-5 md:w-5" />}
           </button>
 
           <SyncStatus />

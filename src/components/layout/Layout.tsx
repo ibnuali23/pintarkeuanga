@@ -10,7 +10,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-6 pb-24 md:pb-6">
+      <main className="container py-4 pb-24 md:py-6 md:pb-6">
         {children}
       </main>
       <FloatingActionButton />
