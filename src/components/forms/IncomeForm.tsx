@@ -128,7 +128,7 @@ export function IncomeForm({ onSubmit, paymentMethods = [] }: IncomeFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4 md:space-y-6 w-full min-w-0">
       {/* Date picker */}
       <div className="space-y-2">
         <Label>Tanggal</Label>
