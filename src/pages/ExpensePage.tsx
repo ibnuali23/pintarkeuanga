@@ -186,11 +186,11 @@ export default function ExpensePage() {
                     {recentExpenses.map((expense) => (
                       <div
                         key={expense.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-destructive/5 border border-destructive/20 hover:bg-destructive/10 transition-colors group"
+                        className="flex items-start justify-between gap-2 p-3 rounded-xl bg-destructive/5 border border-destructive/20 hover:bg-destructive/10 transition-colors group"
                       >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/20">
-                            <span className="text-lg">{categoryIcons[expense.category] || '💰'}</span>
+                        <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                          <div className="flex h-9 w-9 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/20">
+                            <span className="text-base md:text-lg">{categoryIcons[expense.category] || '💰'}</span>
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="font-medium text-sm truncate">
@@ -202,30 +202,34 @@ export default function ExpensePage() {
                             <p className="text-xs text-muted-foreground">
                               {format(parseISO(expense.date), 'd MMM yyyy', { locale: id })}
                             </p>
+                            <p className="font-semibold text-sm text-destructive mt-1 md:hidden">
+                              -{formatCurrency(Number(expense.amount))}
+                            </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-sm text-destructive whitespace-nowrap">
+                        <div className="flex flex-col md:flex-row items-end md:items-center gap-1 md:gap-2 shrink-0">
+                          <p className="font-semibold text-sm text-destructive whitespace-nowrap hidden md:block">
                             -{formatCurrency(Number(expense.amount))}
                           </p>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => openEditModal(expense)}
-                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openEditModal(expense)}
+                              className="h-8 w-8 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Hapus Pengeluaran?</AlertDialogTitle>
@@ -246,6 +250,7 @@ export default function ExpensePage() {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
+                          </div>
                         </div>
                       </div>
                     ))}
